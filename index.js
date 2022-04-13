@@ -1,8 +1,10 @@
 const canvas = document.querySelector('canvas')
-canvas.width = window.innerWidth
-canvas.height = window.innerHeight
+canvas.width = innerWidth
+canvas.height = innerHeight
 
 const c = canvas.getContext('2d')
+
+const gravity = 1
 
 class Player {
     constructor() {
@@ -12,7 +14,7 @@ class Player {
         }
         this.velocity = {
             x: 0,
-            y: 1
+            y: 0
         }
         this.width = 30
         this.height = 30
@@ -23,8 +25,10 @@ class Player {
     }    
     update() {
         this.draw()
-        this.position.x += this.velocity.x 
         this.position.y += this.velocity.y 
+        if(this.position.y + this.height + this.velocity.y <= canvas.height) 
+            this.velocity.y += gravity
+        else this.velocity.y = 0
     }
 }
 
@@ -34,7 +38,7 @@ function animate() {
     requestAnimationFrame(animate)
     c.clearRect(0, 0, canvas.width, canvas.height)
     player.update()
-    console.log('go')
+    // console.log('go')
 }
 
-// animate()
+animate()
