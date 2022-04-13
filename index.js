@@ -4,7 +4,7 @@ canvas.height = innerHeight
 
 const c = canvas.getContext('2d')
 
-const gravity = 1
+const gravity = 2.5
 
 class Player {
     constructor() {
