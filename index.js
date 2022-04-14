@@ -68,7 +68,13 @@ function animate() {
     player.update()
     platform.draw()
 
-    player.velocity.x = keys.right.pressed && player.position.x < 450 ? 5 : keys.left.pressed && player.position.x > 100 ? -5 : 0
+    if(keys.right.pressed && player.position.x < 450) player.velocity.x = 5
+    else if(keys.left.pressed && player.position.x > 100) player.velocity.x = -5 
+    else {
+        player.velocity.x = 0
+        if(keys.right.pressed) platform.position.x -= 5
+        else if(keys.left.pressed) platform.position.x += 5
+    }
 
     // platform collision detection
     if(player.position.y + player.height <= platform.position.y && 
