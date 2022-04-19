@@ -1,3 +1,6 @@
+import platform from "../../img/platform.png"
+console.log(platform)
+
 const canvas = document.querySelector('canvas')
 canvas.width = innerWidth
 canvas.height = innerHeight
@@ -6,6 +9,7 @@ const c = canvas.getContext('2d')
 
 const gravity = 0.5
 const jumpHeight = 15
+let scrollOffset = 0
 
 class Player {
     constructor() {
@@ -35,7 +39,7 @@ class Player {
 }
 
 class Platform {
-    constructor({x, y}) {
+    constructor({ x, y }) {
         this.position = {
             x,
             y
@@ -51,8 +55,8 @@ class Platform {
 
 const player = new Player()
 const platforms = [
-    new Platform({x:200, y:300}), 
-    new Platform({x:500, y:300})
+    new Platform({ x: 200, y: 300 }),
+    new Platform({ x: 500, y: 300 })
 ]
 
 const keys = {
@@ -71,22 +75,37 @@ function animate() {
     player.update()
     platforms.forEach(platform => platform.draw())
 
-    if(keys.right.pressed && player.position.x < 450) player.velocity.x = 5
-    else if(keys.left.pressed && player.position.x > 100) player.velocity.x = -5 
-    else {
-        player.velocity.x = 0
-        if(keys.right.pressed) platforms.forEach(platform => platform.position.x -= 5) 
-        else if(keys.left.pressed) platforms.forEach(platform => platform.position.x += 5)
+    if (keys.right.pressed && player.position.x < 450) {
+        player.velocity.x = 5
     }
+    else if (keys.left.pressed && player.position.x > 100) {
+        player.velocity.x = -5
+    }
+    else {
+        player.velocity.x *= 0.9 // gradual stop
+        // player.velocity.x = 0 // sudden stop
 
+        if (keys.right.pressed) {
+            scrollOffset += 5
+            platforms.forEach(platform => platform.position.x -= 5)
+        } 
+        else if (keys.left.pressed) {
+            scrollOffset -= 5
+            platforms.forEach(platform => platform.position.x += 5)
+        }
+    }
     // platform collision detection
     platforms.forEach(platform => {
-    if(player.position.y + player.height <= platform.position.y && 
-       player.position.y + player.height + player.velocity.y >= platform.position.y &&
-       player.position.x + player.width >= platform.position.x &&
-       player.position.x <= platform.position.x + platform.width
-    ) player.velocity.y = 0 ;
+        if (player.position.y + player.height <= platform.position.y &&
+            player.position.y + player.height + player.velocity.y >= platform.position.y &&
+            player.position.x + player.width >= platform.position.x &&
+            player.position.x <= platform.position.x + platform.width
+        ) player.velocity.y = 0;
     })
+
+    if (scrollOffset > 440) {
+        console.log("win")
+    }
 }
 
 animate()
