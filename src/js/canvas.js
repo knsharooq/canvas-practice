@@ -1,15 +1,16 @@
-import platform from "../../img/platform.png"
-console.log(platform)
+import platformImgSrc from "../../img/platform.png"
+import hillsImgSrc from "../../img/hills.png"
+import backgroundImgSrc from "../../img/background.png"
+import platformSmallTallImgSrc from "../../img/platformSmallTall.png"
 
 const canvas = document.querySelector('canvas')
-canvas.width = innerWidth
-canvas.height = innerHeight
+canvas.width = 1024
+canvas.height = 576
 
 const c = canvas.getContext('2d')
 
 const gravity = 0.5
-const jumpHeight = 15
-let scrollOffset = 0
+const jumpHeight = 10
 
 class Player {
     constructor() {
@@ -23,6 +24,7 @@ class Player {
         }
         this.width = 30
         this.height = 30
+        this.speed = 10
     }
     draw() {
         c.fillStyle = 'red'
@@ -34,30 +36,53 @@ class Player {
         this.position.y += this.velocity.y
         if (this.position.y + this.height + this.velocity.y <= canvas.height)
             this.velocity.y += gravity
-        else this.velocity.y = 0
     }
 }
 
 class Platform {
-    constructor({ x, y }) {
+    constructor({ x, y, image }) {
         this.position = {
             x,
             y
         }
-        this.width = 200
-        this.height = 20
+        this.image = image
+        this.width = this.image.width
+        this.height = this.image.height
     }
     draw() {
-        c.fillStyle = 'blue'
-        c.fillRect(this.position.x, this.position.y, this.width, this.height)
+        c.drawImage(this.image, this.position.x, this.position.y)
     }
 }
 
-const player = new Player()
-const platforms = [
-    new Platform({ x: 200, y: 300 }),
-    new Platform({ x: 500, y: 300 })
-]
+class GenericObject {
+    constructor({ x, y, image }) {
+        this.position = {
+            x,
+            y
+        }
+        this.image = image
+        this.width = this.image.width
+        this.height = this.image.height
+    }
+    draw() {
+        c.drawImage(this.image, this.position.x, this.position.y)
+    }
+}
+
+function createImage(imageSrc) {
+    const image = new Image()
+    image.src = imageSrc
+    return image
+}
+
+const platformImg = createImage(platformImgSrc)
+const backgroundImg = createImage(backgroundImgSrc)
+const hillsImg = createImage(hillsImgSrc)
+const platformSmallTallImg = createImage(platformSmallTallImgSrc)
+
+let player = new Player()
+let platforms = []
+let genericObjects = []
 
 const keys = {
     right: {
@@ -68,30 +93,52 @@ const keys = {
     }
 }
 
+let scrollOffset = 0
+
+function init() {
+    player = new Player()
+    platforms = [
+        new Platform({ x: platformImg.width * 5 + 400 - 2 - platformSmallTallImg.width, y: 400, image: platformSmallTallImg }),
+        new Platform({ x: -1, y: 500, image: platformImg }),
+        new Platform({ x: platformImg.width - 3, y: 500, image: platformImg }),
+        new Platform({ x: platformImg.width * 2 + 150, y: 500, image: platformImg }),
+        new Platform({ x: platformImg.width * 3 + 400, y: 500, image: platformImg }),
+        new Platform({ x: platformImg.width * 4 + 400 - 2, y: 500, image: platformImg }),
+        new Platform({ x: platformImg.width * 5 + 850 - 2, y: 500, image: platformImg })
+    ]
+    genericObjects = [
+        new GenericObject({ x: -1, y: -1, image: backgroundImg }),
+        new GenericObject({ x: 0, y: 0, image: hillsImg }),
+    ]
+    scrollOffset = 0
+}
+
 function animate() {
     requestAnimationFrame(animate)
-    c.clearRect(0, 0, canvas.width, canvas.height)
+    c.fillStyle = 'white'
+    c.fillRect(0, 0, canvas.width, canvas.height)
 
-    player.update()
+    genericObjects.forEach(genericObject => genericObject.draw())
     platforms.forEach(platform => platform.draw())
+    player.update()
 
     if (keys.right.pressed && player.position.x < 450) {
-        player.velocity.x = 5
+        player.velocity.x = player.speed
     }
-    else if (keys.left.pressed && player.position.x > 100) {
-        player.velocity.x = -5
+    else if ((keys.left.pressed && player.position.x > 100) || (keys.left.pressed && scrollOffset === 0 && player.position.x > 0)) {
+        player.velocity.x = -player.speed
     }
     else {
-        player.velocity.x *= 0.9 // gradual stop
-        // player.velocity.x = 0 // sudden stop
-
+        player.velocity.x = 0
         if (keys.right.pressed) {
-            scrollOffset += 5
-            platforms.forEach(platform => platform.position.x -= 5)
-        } 
-        else if (keys.left.pressed) {
-            scrollOffset -= 5
-            platforms.forEach(platform => platform.position.x += 5)
+            scrollOffset += player.speed
+            platforms.forEach(platform => platform.position.x -= player.speed)
+            genericObjects.forEach(genericObject => genericObject.position.x -= player.speed * .66)
+        }
+        else if (keys.left.pressed && scrollOffset > 0) {
+            scrollOffset -= player.speed
+            platforms.forEach(platform => platform.position.x += player.speed)
+            genericObjects.forEach(genericObject => genericObject.position.x += player.speed * .66)
         }
     }
     // platform collision detection
@@ -103,10 +150,19 @@ function animate() {
         ) player.velocity.y = 0;
     })
 
-    if (scrollOffset > 440) {
+    // win condition
+    if (scrollOffset > platformImg.width * 5 + 450 - 2) {
         console.log("win")
     }
+
+    // lose condition
+    if (player.position.y > canvas.height) {
+        init()
+        console.log("lose")
+    }
 }
+
+init()
 
 animate()
 
@@ -128,9 +184,9 @@ addEventListener('keyup', ({ key }) => {
     switch (key) {
         case 'a':
             keys.left.pressed = false
-            break;
+            break
         case 'd':
             keys.right.pressed = false
-            break;
+            break
     }
 })

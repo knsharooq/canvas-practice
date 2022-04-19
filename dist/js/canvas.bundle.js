@@ -86,6 +86,32 @@
 /************************************************************************/
 /******/ ({
 
+/***/ "./img/background.png":
+/*!****************************!*\
+  !*** ./img/background.png ***!
+  \****************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony default export */ __webpack_exports__["default"] = (__webpack_require__.p + "072d51bcc9c09311d4c2a6708b05bddc.png");
+
+/***/ }),
+
+/***/ "./img/hills.png":
+/*!***********************!*\
+  !*** ./img/hills.png ***!
+  \***********************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony default export */ __webpack_exports__["default"] = (__webpack_require__.p + "cfffe4c371f5e11d372b398a87c51dd0.png");
+
+/***/ }),
+
 /***/ "./img/platform.png":
 /*!**************************!*\
   !*** ./img/platform.png ***!
@@ -99,6 +125,19 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./img/platformSmallTall.png":
+/*!***********************************!*\
+  !*** ./img/platformSmallTall.png ***!
+  \***********************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony default export */ __webpack_exports__["default"] = (__webpack_require__.p + "0587f9be8e442eb74b2fe283bbf1a947.png");
+
+/***/ }),
+
 /***/ "./src/js/canvas.js":
 /*!**************************!*\
   !*** ./src/js/canvas.js ***!
@@ -109,6 +148,9 @@ __webpack_require__.r(__webpack_exports__);
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _img_platform_png__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../img/platform.png */ "./img/platform.png");
+/* harmony import */ var _img_hills_png__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../img/hills.png */ "./img/hills.png");
+/* harmony import */ var _img_background_png__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../img/background.png */ "./img/background.png");
+/* harmony import */ var _img_platformSmallTall_png__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../img/platformSmallTall.png */ "./img/platformSmallTall.png");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -116,14 +158,15 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
 
-console.log(_img_platform_png__WEBPACK_IMPORTED_MODULE_0__["default"]);
+
+
+
 var canvas = document.querySelector('canvas');
-canvas.width = innerWidth;
-canvas.height = innerHeight;
+canvas.width = 1024;
+canvas.height = 576;
 var c = canvas.getContext('2d');
 var gravity = 0.5;
-var jumpHeight = 15;
-var scrollOffset = 0;
+var jumpHeight = 10;
 
 var Player = /*#__PURE__*/function () {
   function Player() {
@@ -139,6 +182,7 @@ var Player = /*#__PURE__*/function () {
     };
     this.width = 30;
     this.height = 30;
+    this.speed = 10;
   }
 
   _createClass(Player, [{
@@ -153,7 +197,7 @@ var Player = /*#__PURE__*/function () {
       this.draw();
       this.position.x += this.velocity.x;
       this.position.y += this.velocity.y;
-      if (this.position.y + this.height + this.velocity.y <= canvas.height) this.velocity.y += gravity;else this.velocity.y = 0;
+      if (this.position.y + this.height + this.velocity.y <= canvas.height) this.velocity.y += gravity;
     }
   }]);
 
@@ -163,7 +207,8 @@ var Player = /*#__PURE__*/function () {
 var Platform = /*#__PURE__*/function () {
   function Platform(_ref) {
     var x = _ref.x,
-        y = _ref.y;
+        y = _ref.y,
+        image = _ref.image;
 
     _classCallCheck(this, Platform);
 
@@ -171,29 +216,61 @@ var Platform = /*#__PURE__*/function () {
       x: x,
       y: y
     };
-    this.width = 200;
-    this.height = 20;
+    this.image = image;
+    this.width = this.image.width;
+    this.height = this.image.height;
   }
 
   _createClass(Platform, [{
     key: "draw",
     value: function draw() {
-      c.fillStyle = 'blue';
-      c.fillRect(this.position.x, this.position.y, this.width, this.height);
+      c.drawImage(this.image, this.position.x, this.position.y);
     }
   }]);
 
   return Platform;
 }();
 
+var GenericObject = /*#__PURE__*/function () {
+  function GenericObject(_ref2) {
+    var x = _ref2.x,
+        y = _ref2.y,
+        image = _ref2.image;
+
+    _classCallCheck(this, GenericObject);
+
+    this.position = {
+      x: x,
+      y: y
+    };
+    this.image = image;
+    this.width = this.image.width;
+    this.height = this.image.height;
+  }
+
+  _createClass(GenericObject, [{
+    key: "draw",
+    value: function draw() {
+      c.drawImage(this.image, this.position.x, this.position.y);
+    }
+  }]);
+
+  return GenericObject;
+}();
+
+function createImage(imageSrc) {
+  var image = new Image();
+  image.src = imageSrc;
+  return image;
+}
+
+var platformImg = createImage(_img_platform_png__WEBPACK_IMPORTED_MODULE_0__["default"]);
+var backgroundImg = createImage(_img_background_png__WEBPACK_IMPORTED_MODULE_2__["default"]);
+var hillsImg = createImage(_img_hills_png__WEBPACK_IMPORTED_MODULE_1__["default"]);
+var platformSmallTallImg = createImage(_img_platformSmallTall_png__WEBPACK_IMPORTED_MODULE_3__["default"]);
 var player = new Player();
-var platforms = [new Platform({
-  x: 200,
-  y: 300
-}), new Platform({
-  x: 500,
-  y: 300
-})];
+var platforms = [];
+var genericObjects = [];
 var keys = {
   right: {
     pressed: false
@@ -202,32 +279,85 @@ var keys = {
     pressed: false
   }
 };
+var scrollOffset = 0;
+
+function init() {
+  player = new Player();
+  platforms = [new Platform({
+    x: platformImg.width * 5 + 400 - 2 - platformSmallTallImg.width,
+    y: 400,
+    image: platformSmallTallImg
+  }), new Platform({
+    x: -1,
+    y: 500,
+    image: platformImg
+  }), new Platform({
+    x: platformImg.width - 3,
+    y: 500,
+    image: platformImg
+  }), new Platform({
+    x: platformImg.width * 2 + 150,
+    y: 500,
+    image: platformImg
+  }), new Platform({
+    x: platformImg.width * 3 + 400,
+    y: 500,
+    image: platformImg
+  }), new Platform({
+    x: platformImg.width * 4 + 400 - 2,
+    y: 500,
+    image: platformImg
+  }), new Platform({
+    x: platformImg.width * 5 + 850 - 2,
+    y: 500,
+    image: platformImg
+  })];
+  genericObjects = [new GenericObject({
+    x: -1,
+    y: -1,
+    image: backgroundImg
+  }), new GenericObject({
+    x: 0,
+    y: 0,
+    image: hillsImg
+  })];
+  scrollOffset = 0;
+}
 
 function animate() {
   requestAnimationFrame(animate);
-  c.clearRect(0, 0, canvas.width, canvas.height);
-  player.update();
+  c.fillStyle = 'white';
+  c.fillRect(0, 0, canvas.width, canvas.height);
+  genericObjects.forEach(function (genericObject) {
+    return genericObject.draw();
+  });
   platforms.forEach(function (platform) {
     return platform.draw();
   });
+  player.update();
 
   if (keys.right.pressed && player.position.x < 450) {
-    player.velocity.x = 5;
-  } else if (keys.left.pressed && player.position.x > 100) {
-    player.velocity.x = -5;
+    player.velocity.x = player.speed;
+  } else if (keys.left.pressed && player.position.x > 100 || keys.left.pressed && scrollOffset === 0 && player.position.x > 0) {
+    player.velocity.x = -player.speed;
   } else {
-    player.velocity.x *= 0.9; // gradual stop
-    // player.velocity.x = 0 // sudden stop
+    player.velocity.x = 0;
 
     if (keys.right.pressed) {
-      scrollOffset += 5;
+      scrollOffset += player.speed;
       platforms.forEach(function (platform) {
-        return platform.position.x -= 5;
+        return platform.position.x -= player.speed;
       });
-    } else if (keys.left.pressed) {
-      scrollOffset -= 5;
+      genericObjects.forEach(function (genericObject) {
+        return genericObject.position.x -= player.speed * .66;
+      });
+    } else if (keys.left.pressed && scrollOffset > 0) {
+      scrollOffset -= player.speed;
       platforms.forEach(function (platform) {
-        return platform.position.x += 5;
+        return platform.position.x += player.speed;
+      });
+      genericObjects.forEach(function (genericObject) {
+        return genericObject.position.x += player.speed * .66;
       });
     }
   } // platform collision detection
@@ -235,16 +365,23 @@ function animate() {
 
   platforms.forEach(function (platform) {
     if (player.position.y + player.height <= platform.position.y && player.position.y + player.height + player.velocity.y >= platform.position.y && player.position.x + player.width >= platform.position.x && player.position.x <= platform.position.x + platform.width) player.velocity.y = 0;
-  });
+  }); // win condition
 
-  if (scrollOffset > 440) {
+  if (scrollOffset > platformImg.width * 5 + 450 - 2) {
     console.log("win");
+  } // lose condition
+
+
+  if (player.position.y > canvas.height) {
+    init();
+    console.log("lose");
   }
 }
 
+init();
 animate();
-addEventListener('keydown', function (_ref2) {
-  var key = _ref2.key;
+addEventListener('keydown', function (_ref3) {
+  var key = _ref3.key;
 
   switch (key) {
     case 'a':
@@ -260,8 +397,8 @@ addEventListener('keydown', function (_ref2) {
       break;
   }
 });
-addEventListener('keyup', function (_ref3) {
-  var key = _ref3.key;
+addEventListener('keyup', function (_ref4) {
+  var key = _ref4.key;
 
   switch (key) {
     case 'a':
